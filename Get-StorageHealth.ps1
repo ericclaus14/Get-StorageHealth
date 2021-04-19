@@ -224,6 +224,9 @@ if ($errorPresent) {
     $SMTPServer = "[SMTP Server]"
     $SMTPPort = "25"
     Send-MailMessage -From $From -to $To -Subject $Subject -Body $Body -SmtpServer $SMTPServer -port $SMTPPort #-UseSsl
+    
+    $To = "[Alert email address]"
+    Send-MailMessage -From $From -to $To -Subject $Subject -Body $Body -SmtpServer $SMTPServer -port $SMTPPort #-UseSsl
 }
 
 # Send a weekly report, regardless of the status of the storage
