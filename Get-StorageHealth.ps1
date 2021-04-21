@@ -44,7 +44,7 @@ function Show-HumanReadableSize {
 $logFileRootDir = "C:\StorageLogs"
 
 #Collect storage statuses
-$physicalDisks = Get-PhysicalDisk
+$physicalDisks = Get-PhysicalDisk | Where-Object Usage -ne "Retired"
 $storagePools = Get-StoragePool | Where-Object IsPrimordial -ne "False"
 $virtualDisks = Get-VirtualDisk
 $CSVs = Get-ClusterSharedVolume
