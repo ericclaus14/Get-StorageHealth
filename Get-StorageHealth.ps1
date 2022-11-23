@@ -76,6 +76,7 @@ $CSVsWithErrors = @()
 foreach ($pd in $physicalDisks) {
     #Get the various properties of the physical disk 
     $Number = $pd.DeviceId
+    if ($Number -eq $null) {$Number = "NoNumber"}
     $FriendlyName = $pd.FriendlyName
     $SerialNumber = $pd.SerialNumber
     $MediaType = $pd.MediaType
@@ -83,6 +84,7 @@ foreach ($pd in $physicalDisks) {
     $CanPool = $pd.CanPool
     $OperationalStatus = $pd.OperationalStatus
     $HealthStatus = $pd.HealthStatus
+    $Usage = $pd.Usage
     
     $physicalDisk_propertiesArr += [PSCustomObject] @{
         Number = $Number
@@ -93,6 +95,7 @@ foreach ($pd in $physicalDisks) {
         CanPool = $CanPool
         OperationalStatus = $OperationalStatus
         HealthStatus = $HealthStatus
+        Usage = $Usage
     } 
 
     # Check if there are any errors based upon the "OK" parameters specified above
@@ -103,7 +106,7 @@ foreach ($pd in $physicalDisks) {
     }
     if ($HealthStatus -ne $physicalDisk_HealthStatusOK) {
         $errorPresent = $True
-        $physicalDisksWithErrorss += @{$Number = "HealthStatus is $($HealthStatus)!"} 
+        $physicalDisksWithErrors += @{$Number = "HealthStatus is $($HealthStatus)!"} 
     }
 }
 
