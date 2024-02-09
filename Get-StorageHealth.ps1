@@ -4,7 +4,7 @@
 
 .NOTES
     Author: Eric Claus, Sys Admin, North American Division of the Seventh-day Adventist Church
-    Last modified: 3/9/2021
+    Last modified: 2/9/2024
 #>
 
 Param(
@@ -85,7 +85,8 @@ foreach ($pd in $physicalDisks) {
     $OperationalStatus = $pd.OperationalStatus
     $HealthStatus = $pd.HealthStatus
     $Usage = $pd.Usage
-    
+    $SlotNumber = $pd.SlotNumber
+
     $physicalDisk_propertiesArr += [PSCustomObject] @{
         Number = $Number
         FriendlyName = $FriendlyName
@@ -101,12 +102,32 @@ foreach ($pd in $physicalDisks) {
     # Check if there are any errors based upon the "OK" parameters specified above
     if ($OperationalStatus -ne $physicalDisk_OperationalStatusOK) {
         $errorPresent = $True
-        # Create a hash table containing the name of the physical disk and a description of the error
-        $physicalDisksWithErrors += @{$Number = "OperationalStatus is $($OperationalStatus)!"} 
+
+        # Get the node the physical disk is attached to
+        $nodeview = $pd | Get-PhysicalDiskStorageNodeView
+        foreach ($individualNode in $nodeview) {
+            if ($individualNode.IsPhysicallyConnected) {
+                $length = $individualNode.StorageNodeObjectId.Length
+                $node = $individualNode.StorageNodeObjectId.Substring($length - 6,5)
+            }
+        }
+
+        # Create a hash table containing the number of the physical disk, a description of the error, the slot number, and the node
+        $physicalDisksWithErrors += @{$Number = "OperationalStatus is $($OperationalStatus)! Location: $($node):$($SlotNumber)"} 
     }
     if ($HealthStatus -ne $physicalDisk_HealthStatusOK) {
         $errorPresent = $True
-        $physicalDisksWithErrors += @{$Number = "HealthStatus is $($HealthStatus)!"} 
+
+        # Get the node the physical disk is attached to
+        $nodeview = $pd | Get-PhysicalDiskStorageNodeView
+        foreach ($individualNode in $nodeview) {
+            if ($individualNode.IsPhysicallyConnected) {
+                $length = $individualNode.StorageNodeObjectId.Length
+                $node = $individualNode.StorageNodeObjectId.Substring($length - 6,5)
+            }
+        }
+
+        $physicalDisksWithErrors += @{$Number = "HealthStatus is $($HealthStatus)! Location: $($node):$($SlotNumber)"} 
     }
 }
 
